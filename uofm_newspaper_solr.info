@@ -1,0 +1,8 @@
+name = UofM Newspaper Solr Display
+description = "Mimick the Islandora newspaper display using Solr instead of Sparql"
+package = Islandora Local Customization
+version = 7.x-dev
+core = 7.x
+dependencies[] = islandora_newspaper
+dependencies[] = islandora_solr_search
+php = 5.3

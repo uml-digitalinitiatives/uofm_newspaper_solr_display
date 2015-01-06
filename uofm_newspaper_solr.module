@@ -1,0 +1,111 @@
+<?php
+/**
+ * @file Hooks and theme functions
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function uofm_newspaper_solr_theme($existing, $type, $theme, $path) {
+  return array(
+    'uofm_newspaper_solr' => array(
+      'function' => '__uofm_newspaper_solr_theme_islandora_newspaper',
+      'pattern' => 'islandora_newspaper__',
+      'variables' => array(
+        'object' => NULL,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_CMODEL_PID_islandora_view_object().
+ */
+function uofm_newspaper_solr_islandora_newspapercmodel_islandora_view_object(AbstractObject $newspaper) {
+  $output = theme('uofm_newspaper_solr', array('object' => $newspaper));
+  return array(
+    'uofm_newspaper_solr' => $output,
+  );
+}
+
+function __uofm_newspaper_solr_theme_islandora_newspaper(array $variables) {
+  module_load_include('inc', 'islandora_newspaper', 'includes/utilities');
+  drupal_add_js('misc/collapse.js');
+  $object = $variables['object'];
+  $issues = uofm_newspaper_solr_get_issues($object);
+  $grouped_issues = islandora_newspaper_group_issues($issues);
+  $output = array(
+    'controls' => array(
+      '#theme' => 'links',
+      '#attributes' => array(
+        'class' => array('links', 'inline'),
+      ),
+      '#links' => array(
+        array(
+          'title' => t('Expand all months'),
+          'href' => "javascript://void(0)",
+          'html' => TRUE,
+          'external' => TRUE,
+          'attributes' => array(
+            'onclick' => "Drupal.toggleFieldset(jQuery('fieldset.month.collapsed'));",
+          ),
+        ),
+        array(
+          'title' => t('Collapse all months'),
+          'href' => "javascript://void(0)",
+          'html' => TRUE,
+          'external' => TRUE,
+          'attributes' => array(
+            'onclick' => "Drupal.toggleFieldset(jQuery('fieldset.month:not(.collapsed)'));",
+          ),
+        ),
+      ),
+    ),
+    'tabs' => array(
+      '#type' => 'vertical_tabs',
+    ),
+  );
+  $tabs = &$output['tabs'];
+  foreach ($grouped_issues as $year => $months) {
+    $tabs[$year] = array(
+      '#title' => $year,
+      '#type' => 'fieldset',
+    );
+    foreach ($months as $month => $days) {
+      $month_name = t("@date", array(
+        "@date" => date("F", mktime(0, 0, 0, $month, 1, 2000)),
+      ));
+      $tabs[$year][$month] = array(
+        '#title' => $month_name,
+        '#type' => 'fieldset',
+        '#attributes' => array(
+          'class' => array('collapsible', 'collapsed', 'month'),
+        ),
+      );
+      foreach ($days as $day => $issues) {
+        foreach ($issues as $issue) {
+          $tabs[$year][$month][$day][] = array(
+            '#theme' => 'link',
+            '#prefix' => '<div>',
+            '#suffix' => '</div>',
+            '#text' => t("@month @day, @year", array(
+                '@year' => $year,
+                '@month' => $month_name,
+                '@day' => $day,
+                )),
+            '#path' => "islandora/object/{$issue['pid']}",
+            '#options' => array(
+              'attributes' => array(),
+              'html' => FALSE,
+            ),
+          );
+        }
+      }
+      ksort($tabs[$year][$month]);
+    }
+    ksort($tabs[$year]);
+  }
+  ksort($tabs);
+  return drupal_render($output);
+}
+
