@@ -3,6 +3,8 @@
  * @file Hooks and theme functions
  */
 
+require_once dirname(__FILE__) . '/includes/utilities.inc';
+
 /**
  * Implements hook_theme().
  */
@@ -28,6 +30,18 @@ function uofm_newspaper_solr_islandora_newspapercmodel_islandora_view_object(Abs
   );
 }
 
+/**
+ * Implements hook_CMODEL_PID_islandora_view_object_alter().
+ */
+function uofm_newspaper_solr_islandora_newspapercmodel_islandora_view_object_alter(AbstractObject &$newspaper, array &$html) {
+  if (array_key_exists('islandora_newspaper', $html)) {
+    unset($html['islandora_newspaper']);
+  }
+}
+
+/**
+ * Generates the Solr list of newspaper issues
+ */
 function __uofm_newspaper_solr_theme_islandora_newspaper(array $variables) {
   module_load_include('inc', 'islandora_newspaper', 'includes/utilities');
   drupal_add_js('misc/collapse.js');

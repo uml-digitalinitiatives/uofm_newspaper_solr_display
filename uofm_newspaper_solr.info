@@ -4,5 +4,5 @@ package = Islandora Local Customization
 version = 7.x-dev
 core = 7.x
 dependencies[] = islandora_newspaper
-dependencies[] = islandora_solr_search
+dependencies[] = islandora_solr
 php = 5.3

@@ -20,7 +20,7 @@ REQUIREMENTS
 Dependent on:
 
 * islandora\_newspaper
-* islandora\_solr\_search
+* islandora\_solr
 
 INSTALLATION
 ------------
