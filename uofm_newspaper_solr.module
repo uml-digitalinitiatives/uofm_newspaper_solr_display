@@ -31,6 +31,17 @@ function uofm_newspaper_solr_islandora_newspapercmodel_islandora_view_object(Abs
 }
 
 /**
+ * Implements hook_module_implements_alter().
+ */
+function uofm_newspaper_solr_module_implements_alter(&$implementations, $hook) {
+  if (strtolower($hook) == 'islandora_newspapercmodel_islandora_view_object') {
+    if (array_key_exists('islandora_newspaper', $implementations)) {
+      unset($implementations['islandora_newspaper']);
+    }
+  }
+}
+
+/**
  * Implements hook_CMODEL_PID_islandora_view_object_alter().
  */
 function uofm_newspaper_solr_islandora_newspapercmodel_islandora_view_object_alter(AbstractObject &$newspaper, array &$html) {
