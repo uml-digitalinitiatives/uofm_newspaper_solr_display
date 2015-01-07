@@ -1,6 +1,7 @@
 <?php
 /**
- * @file Utility functions
+ * @file
+ * Utility functions
  */
 
 /**
@@ -26,7 +27,13 @@ function uofm_newspaper_solr_get_issues(AbstractObject $object) {
   $solr_build = new IslandoraSolrQueryProcessor();
 
   $parent_field = variable_get('islandora_newspaper_parent_issue_solr_field', 'RELS_EXT_isMemberOf_uri_ms');
-  $solr_param = array('rows' => 30000, 'limit' => 30000, 'fl' => 'mods_originInfo_dateIssued_dt, fgs_label_s, PID, RELS_EXT_isSequenceNumber', 'hl' => 'false', 'facet' => 'false');
+  $solr_param = array(
+    'rows' => 30000,
+    'limit' => 30000,
+    'fl' => 'mods_originInfo_dateIssued_dt, fgs_label_s, PID, RELS_EXT_isSequenceNumber',
+    'hl' => 'false',
+    'facet' => 'false',
+  );
   $solr_query = "($parent_field:\"info:fedora/{$object->id}\"+AND+RELS_EXT_hasModel_uri_ms:\"info:fedora/islandora:newspaperIssueCModel\")";
   $solr_build->buildQuery($solr_query, $solr_param);
   $solr_build->solrParams = array_merge($solr_build->solrParams, $solr_param);
@@ -48,7 +55,7 @@ function uofm_newspaper_solr_get_issues(AbstractObject $object) {
   if (isset($results)) {
     $solr_results = json_decode($results->getRawResponse(), TRUE);
     $results = $solr_results['response']['docs'];
-  } 
+  }
   // Map the results using a default Datetime for missing issued dates.
   $map_results = function($o) {
     try {
@@ -62,7 +69,7 @@ function uofm_newspaper_solr_get_issues(AbstractObject $object) {
       watchdog_exception('islandora_newspaper', $e, $msg, $vars, WATCHDOG_ERROR);
     }
     if (!array_key_exists('RELS_EXT_isSequenceNumber', $o)) {
-      $o['RELS_EXT_isSequenceNumber']= 0;
+      $o['RELS_EXT_isSequenceNumber'] = 0;
     }
     return array(
       'pid' => $o['PID'],
